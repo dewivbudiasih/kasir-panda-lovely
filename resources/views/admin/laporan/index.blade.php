@@ -5,19 +5,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan Penjualan - Panda Lovely</title>
+    {{-- Menggunakan CDN Tailwind standar agar tampilan rapi --}}
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         body { font-family: 'Poppins', sans-serif; }
-        .modal { visibility: hidden; opacity: 0; transition: all 0.3s ease; }
+        /* Style sederhana untuk Modal */
+        .modal { visibility: hidden; opacity: 0; transition: all 0.2s ease-in-out; }
         .modal.active { visibility: visible; opacity: 1; }
-        .modal-content { transform: scale(0.95); transition: all 0.3s ease; }
+        .modal-content { transform: scale(0.95); transition: all 0.2s ease-in-out; }
         .modal.active .modal-content { transform: scale(1); }
+
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
     </style>
 </head>
 
@@ -27,9 +30,8 @@
 
         <aside class="w-64 bg-pink-100 p-6 shadow-lg flex flex-col h-full z-20 relative">
             <div class="flex items-center gap-3 mb-10">
-                <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm p-0.5 border-2 border-pink-200">
-                    {{-- Pastikan file gambar ada, atau gunakan placeholder --}}
-                    <img src="{{ asset('img/panda.jpg') }}" onerror="this.src='https://ui-avatars.com/api/?name=Panda+Lovely&background=random'" alt="Logo" class="w-full h-full object-cover rounded-full">
+                <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm border-2 border-pink-200 overflow-hidden">
+                    <img src="{{ asset('img/panda.jpg') }}" onerror="this.src='https://ui-avatars.com/api/?name=Panda+Lovely&background=pink&color=white'" alt="Logo" class="w-full h-full object-cover">
                 </div>
                 <div class="flex flex-col">
                     <h1 class="text-xl font-bold text-pink-600 leading-none tracking-wide">PANDA</h1>
@@ -38,9 +40,10 @@
             </div>
 
             <nav class="space-y-2 flex-1 overflow-y-auto">
-                <a href="{{ route('kasir.dashboard') }}" class="flex items-center gap-3 p-3 text-gray-600 hover:bg-pink-200 rounded-xl transition font-medium">
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 p-3 text-gray-600 hover:bg-pink-200 rounded-xl transition font-medium">
                     <i class="ph ph-squares-four text-xl"></i> Dashboard
                 </a>
+                
                 <a href="{{ route('laporan.index') }}" class="flex items-center gap-3 p-3 bg-white text-pink-600 font-bold rounded-xl shadow-sm transition">
                     <i class="ph-fill ph-file-text text-xl"></i> Laporan
                 </a>
@@ -49,7 +52,7 @@
             <div class="mt-auto pt-6 border-t border-pink-200/50">
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="w-full flex items-center justify-center gap-2 bg-white hover:bg-pink-50 text-pink-600 font-bold py-3 px-4 rounded-xl shadow-sm border border-pink-200 transition-all duration-300 transform hover:scale-[1.02] active:scale-95">
+                    <button type="submit" class="w-full flex items-center justify-center gap-2 bg-white hover:bg-pink-50 text-pink-600 font-bold py-3 px-4 rounded-xl shadow-sm border border-pink-200 transition">
                         <i class="ph-bold ph-sign-out text-lg"></i>
                         <span>Logout</span>
                     </button>
@@ -90,6 +93,7 @@
                             <i class="ph-bold ph-funnel"></i> Filter
                         </button>
 
+                        {{-- Tombol PDF --}}
                         <button type="submit" formaction="{{ route('laporan.cetakPdf') }}" 
                             class="bg-gray-800 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-900 transition shadow-md shadow-gray-300 flex items-center gap-2">
                             <i class="ph-bold ph-printer"></i> PDF
@@ -125,7 +129,7 @@
                             <td class="p-4 font-mono font-bold text-gray-800">#TRX-{{ $row->id }}</td>
                             <td class="p-4 font-bold text-green-600">Rp {{ number_format($row->total_price ?? 0, 0, ',', '.') }}</td>
                             <td class="p-4 text-center">
-                                <button onclick="openModal('modal-{{ $row->id }}')" class="bg-white border border-pink-200 text-pink-500 hover:bg-pink-500 hover:text-white px-4 py-1.5 rounded-lg text-xs font-medium transition shadow-sm">
+                                <button onclick="openModal('modal-{{ $row->id }}')" class="bg-white border border-pink-200 text-pink-500 hover:bg-pink-500 hover:text-white px-4 py-1.5 rounded-lg text-xs font-medium transition shadow-sm cursor-pointer">
                                     Detail
                                 </button>
                             </td>
@@ -156,6 +160,7 @@
 
     @foreach($laporan as $row)
     <div id="modal-{{ $row->id }}" class="modal fixed inset-0 z-50 flex items-center justify-center p-4">
+        {{-- Overlay hitam --}}
         <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closeModal('modal-{{ $row->id }}')"></div>
 
         <div class="modal-content bg-white w-full max-w-2xl rounded-2xl shadow-2xl relative z-10 flex flex-col max-h-[90vh]">
@@ -164,11 +169,11 @@
                 <div>
                     <h3 class="text-xl font-bold text-gray-800">Detail Transaksi</h3>
                     <div class="flex items-center gap-2 mt-1">
-                        <span class="bg-green-100 text-green-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide">Lunas</span>
+                        <span class="bg-green-100 text-green-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide">Sukses</span>
                         <span class="text-sm text-gray-400 font-mono">#TRX-{{ $row->id }}</span>
                     </div>
                 </div>
-                <button onclick="closeModal('modal-{{ $row->id }}')" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-500 transition">
+                <button onclick="closeModal('modal-{{ $row->id }}')" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-500 transition cursor-pointer">
                     <i class="ph-bold ph-x"></i>
                 </button>
             </div>
@@ -182,6 +187,7 @@
                     </div>
                     <div class="text-right">
                         <p class="text-gray-400 text-xs uppercase font-bold mb-1">Kasir</p>
+                        {{-- Menggunakan null coalescing (??) agar tidak error jika user dihapus --}}
                         <p class="font-medium text-gray-700">{{ $row->user->name ?? 'Admin' }}</p>
                     </div>
                 </div>
@@ -197,22 +203,28 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
+                            {{-- PENTING: Menggunakan $row->details --}}
                             @foreach($row->details as $item)
                             <tr>
                                 <td class="py-3 px-4">
                                     <span class="font-medium text-gray-800">
-                                        {{ $item->product->name ?? 'Item Terhapus (ID: '.$item->product_id.')' }}
+                                        {{-- Cek apakah produk masih ada di database --}}
+                                        {{ $item->product->name ?? 'Produk tidak ditemukan' }}
                                     </span>
                                     @if(!$item->product)
-                                    <span class="text-[10px] text-red-500 bg-red-50 px-1 rounded ml-1">Deleted</span>
+                                      <span class="text-[10px] text-red-500 bg-red-50 px-1 rounded ml-1">(Dihapus)</span>
                                     @endif
                                 </td>
-                                <td class="py-3 px-4 text-center text-gray-500 font-mono">x{{ $item->qty }}</td>
+                                {{-- PERBAIKAN: Menggunakan 'quantity' bukan 'qty' sesuai standar DB Laravel --}}
+                                <td class="py-3 px-4 text-center text-gray-500 font-mono">
+                                    x{{ $item->quantity ?? $item->qty }}
+                                </td>
                                 <td class="py-3 px-4 text-right text-gray-500">
                                     Rp {{ number_format($item->price, 0, ',', '.') }}
                                 </td>
                                 <td class="py-3 px-4 text-right font-bold text-gray-700">
-                                    Rp {{ number_format($item->price * $item->qty, 0, ',', '.') }}
+                                    {{-- Hitung subtotal manual agar aman --}}
+                                    Rp {{ number_format($item->price * ($item->quantity ?? $item->qty), 0, ',', '.') }}
                                 </td>
                             </tr>
                             @endforeach
@@ -231,7 +243,7 @@
             </div>
 
             <div class="p-5 border-t border-gray-100 bg-gray-50 rounded-b-2xl flex justify-end gap-3">
-                <button onclick="closeModal('modal-{{ $row->id }}')" class="px-5 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-100 transition shadow-sm">
+                <button onclick="closeModal('modal-{{ $row->id }}')" class="px-5 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-100 transition shadow-sm cursor-pointer">
                     Tutup
                 </button>
             </div>
@@ -241,13 +253,19 @@
 
     <script>
         function openModal(id) {
-            document.getElementById(id).classList.add('active');
-            document.body.style.overflow = 'hidden';
+            const modal = document.getElementById(id);
+            if(modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden'; 
+            }
         }
 
         function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
-            document.body.style.overflow = 'auto';
+            const modal = document.getElementById(id);
+            if(modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto'; 
+            }
         }
 
         window.onclick = function(event) {

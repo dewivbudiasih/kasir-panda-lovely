@@ -12,44 +12,34 @@ use App\Http\Controllers\PengaturanController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\KasirController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
-// --- ROUTE UNTUK TAMU (LOGIN) ---
-Route::middleware(['guest'])->group(function () {
+    Route::middleware(['guest'])->group(function () {
     Route::get('/', [LoginController::class, 'index'])->name('login');
     Route::post('/login-proses', [LoginController::class, 'authenticate'])->name('login.proses');
 });
 
-// --- ROUTE LOGOUT ---
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
-// --- ROUTE KHUSUS ADMIN ---
-Route::middleware(['auth', 'cekrole:ADMIN'])->group(function () {
+    Route::middleware(['auth', 'cekrole:ADMIN'])->group(function () {
 
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 
-    // CRUD Produk
-    Route::get('/admin/produk', [ProdukController::class, 'index'])->name('produk.index');
-    Route::post('/admin/produk/store', [ProdukController::class, 'store'])->name('produk.store');
-    Route::put('/admin/produk/update/{id}', [ProdukController::class, 'update'])->name('produk.update');
-    Route::delete('/admin/produk/delete/{id}', [ProdukController::class, 'destroy'])->name('produk.destroy');
+    Route::prefix('admin/produk')->name('produk.')->group(function () {
+        Route::get('/', [ProdukController::class, 'index'])->name('index');
+        Route::post('/store', [ProdukController::class, 'store'])->name('store');
+        Route::put('/update/{id}', [ProdukController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [ProdukController::class, 'destroy'])->name('destroy');
+    });
 
-    // CRUD Kategori
-    Route::get('/admin/kategori', [KategoriController::class, 'index'])->name('kategori.index');
-    Route::post('/admin/kategori/store', [KategoriController::class, 'store'])->name('kategori.store');
-    Route::put('/admin/kategori/update/{id}', [KategoriController::class, 'update'])->name('kategori.update');
-    Route::delete('/admin/kategori/delete/{id}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
+    Route::prefix('admin/kategori')->name('kategori.')->group(function () {
+        Route::get('/', [KategoriController::class, 'index'])->name('index');
+        Route::post('/store', [KategoriController::class, 'store'])->name('store');
+        Route::put('/update/{id}', [KategoriController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [KategoriController::class, 'destroy'])->name('destroy');
+    });
 
-    // --- BAGIAN LAPORAN (Updated) ---
     Route::get('/admin/laporan', [LaporanController::class, 'index'])->name('laporan.index');
-    // Route baru untuk cetak PDF:
     Route::get('/admin/laporan/pdf', [LaporanController::class, 'cetakPdf'])->name('laporan.cetakPdf');
 
-    // Staf (Resource)
     Route::resource('admin/staf', StafController::class)
         ->parameters(['staf' => 'id'])
         ->names('staf');
@@ -58,22 +48,21 @@ Route::middleware(['auth', 'cekrole:ADMIN'])->group(function () {
     Route::post('/admin/pengaturan/update', [PengaturanController::class, 'update'])->name('pengaturan.update');
 });
 
-// --- ROUTE KHUSUS KASIR ---
-Route::middleware(['auth', 'cekrole:KASIR'])->group(function () {
+    Route::middleware(['auth', 'cekrole:KASIR'])->group(function () {
 
     Route::get('/kasir/dashboard', [KasirController::class, 'dashboard'])->name('kasir.dashboard');
     Route::get('/kasir/stok-barang', [KasirController::class, 'index'])->name('kasir.produk.index');
 
-    Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
-
-    Route::post('/transaksi/add-cart', [TransaksiController::class, 'addToCart'])->name('transaksi.addCart');
-    Route::post('/transaksi/remove-cart', [TransaksiController::class, 'removeCart'])->name('transaksi.removeCart');
-    Route::post('/transaksi/clear-cart', [TransaksiController::class, 'clearCart'])->name('transaksi.clearCart');
-
-    Route::post('/transaksi/store', [TransaksiController::class, 'store'])->name('transaksi.store');
-    Route::get('/transaksi/riwayat', [TransaksiController::class, 'riwayat'])->name('transaksi.riwayat');
+    Route::prefix('transaksi')->name('transaksi.')->group(function () {
+        Route::get('/', [TransaksiController::class, 'index'])->name('index');
+        Route::post('/add-cart', [TransaksiController::class, 'addToCart'])->name('addCart');
+        Route::post('/remove-cart', [TransaksiController::class, 'removeCart'])->name('removeCart');
+        Route::post('/clear-cart', [TransaksiController::class, 'clearCart'])->name('clearCart');
+        Route::post('/store', [TransaksiController::class, 'store'])->name('store');
+        Route::get('/riwayat', [TransaksiController::class, 'riwayat'])->name('riwayat');
+    });
 });
 
-Route::middleware(['auth'])->group(function () {
+    Route::middleware(['auth'])->group(function () {
     Route::get('/transaksi/struk/{id}', [TransaksiController::class, 'struk'])->name('transaksi.struk');
 });
