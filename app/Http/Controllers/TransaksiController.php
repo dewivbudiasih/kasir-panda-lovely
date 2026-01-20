@@ -8,6 +8,7 @@ use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class TransaksiController extends Controller
 {
@@ -16,7 +17,7 @@ class TransaksiController extends Controller
         $search = $request->input('search');
 
         $products = Product::query()
-            ->where('stock', '>', 0) 
+            ->where('stock', '>', 0)
             ->when($search, function ($query, $search) {
                 return $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
@@ -82,54 +83,67 @@ class TransaksiController extends Controller
         }
         return response()->json(['success' => true]);
     }
+
     public function clearCart()
     {
         session()->forget('cart');
         return response()->json(['success' => true]);
     }
+
     public function store(Request $request)
     {
+        // 1. Cek Keranjang
         $cartData = session()->get('cart', []);
-
         if (!$cartData || count($cartData) == 0) {
             return back()->with('error', 'Keranjang kosong!');
         }
 
+        // 2. Hitung Total Belanja
         $totalPrice = 0;
         foreach ($cartData as $item) {
             $totalPrice += $item['price'] * $item['qty'];
         }
 
+        // --- PEMBERSIHAN INPUT BAYAR ---
+        $rawBayar = $request->input('bayar');
+        // Hapus karakter selain angka (cth: "Rp 150.000" -> "150000")
+        $cleanBayar = preg_replace('/[^0-9]/', '', $rawBayar);
+        $uangBayar = (int) $cleanBayar;
+        // -------------------------------
 
-        $uangBayar = (int) $request->uang_bayar;
-
-        if ($request->payment_method == 'qris') {
-            $uangBayar = $totalPrice;
+        // 3. Validasi Pembayaran
+        if ($uangBayar <= 0) {
+            return back()->with('error', 'Masukkan nominal uang pembayaran!');
         }
 
         if ($uangBayar < $totalPrice) {
-            return back()->with('error', 'Uang pembayaran kurang!');
+            return back()->with('error', 'Uang pembayaran kurang! Total: Rp ' . number_format($totalPrice, 0, ',', '.') . ', Uang Anda: Rp ' . number_format($uangBayar, 0, ',', '.'));
         }
+
+        // 4. Hitung Kembalian
+        $kembalian = $uangBayar - $totalPrice;
 
         DB::beginTransaction();
         try {
+            // Simpan Transaksi
             $transaction = Transaction::create([
-                'user_id' => Auth::id(), 
+                'user_id' => Auth::id(),
                 'invoice_code' => 'TRX-' . time() . rand(100, 999),
                 'total_price' => $totalPrice,
-                'payment_method' => $request->payment_method,
-                'paid_amount' => $uangBayar, 
-                'change_amount' => $uangBayar - $totalPrice,
+                'bayar' => $uangBayar,      // Pastikan kolom ini ada di $fillable Model
+                'kembalian' => $kembalian,  // Pastikan kolom ini ada di $fillable Model
+                'created_at' => Carbon::now()
             ]);
 
+            // Simpan Detail & Kurangi Stok
             foreach ($cartData as $item) {
                 $produk = Product::lockForUpdate()->find($item['id']);
-                if (!$produk) {
-                    throw new \Exception("Produk ID {$item['id']} tidak ditemukan.");
-                }
 
+                if (!$produk) {
+                    throw new \Exception("Produk hilang.");
+                }
                 if ($produk->stock < $item['qty']) {
-                    throw new \Exception("Stok {$produk->name} habis/kurang saat proses bayar.");
+                    throw new \Exception("Stok habis untuk produk: " . $produk->name);
                 }
 
                 TransactionDetail::create([
@@ -144,10 +158,10 @@ class TransaksiController extends Controller
             }
 
             DB::commit();
-
             session()->forget('cart');
 
             return redirect()->route('transaksi.struk', $transaction->id);
+            
         } catch (\Exception $e) {
             DB::rollback();
             return back()->with('error', 'Gagal: ' . $e->getMessage());
