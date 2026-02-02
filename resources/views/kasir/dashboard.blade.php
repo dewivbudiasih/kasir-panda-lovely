@@ -12,23 +12,24 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #F8FAFC; 
+            background-color: #F8FAFC;
         }
+
         .bg-sidebar {
-            background-color: #FFF1F2; 
-            border-right: 1px solid #FECDD3; 
+            background-color: #FFF1F2;
+            border-right: 1px solid #FECDD3;
         }
 
         .nav-item {
-            color: #64748B; 
+            color: #64748B;
             transition: all 0.2s;
             border-radius: 0.75rem;
             font-weight: 500;
         }
 
         .nav-item:hover:not(.active) {
-            background-color: #FFE4E6; 
-            color: #BE123C; 
+            background-color: #FFE4E6;
+            color: #BE123C;
         }
 
         .nav-item.active {
@@ -38,10 +39,22 @@
             font-weight: 600;
         }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #F1F5F9; }
-        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
     </style>
 </head>
 
@@ -67,20 +80,20 @@
             </div>
 
             <nav class="px-4 space-y-2 mt-2">
-                <a href="{{ route('kasir.dashboard') }}" 
-                   class="nav-item {{ request()->routeIs('kasir.dashboard') ? 'active' : '' }} flex items-center gap-3 px-4 py-3">
+                <a href="{{ route('kasir.dashboard') }}"
+                    class="nav-item {{ request()->routeIs('kasir.dashboard') ? 'active' : '' }} flex items-center gap-3 px-4 py-3">
                     <i class="{{ request()->routeIs('kasir.dashboard') ? 'ph-fill' : 'ph-bold' }} ph-squares-four text-xl"></i>
                     <span>Dashboard</span>
                 </a>
 
-                <a href="{{ route('transaksi.index') }}" 
-                   class="nav-item {{ request()->routeIs('transaksi.index') ? 'active' : '' }} flex items-center gap-3 px-4 py-3">
+                <a href="{{ route('transaksi.index') }}"
+                    class="nav-item {{ request()->routeIs('transaksi.index') ? 'active' : '' }} flex items-center gap-3 px-4 py-3">
                     <i class="{{ request()->routeIs('transaksi.index') ? 'ph-fill' : 'ph-bold' }} ph-cash-register text-xl"></i>
                     <span>Transaksi Baru</span>
                 </a>
 
-                <a href="{{ route('kasir.produk.index') }}" 
-                   class="nav-item {{ request()->routeIs('kasir.produk.index') ? 'active' : '' }} flex items-center gap-3 px-4 py-3">
+                <a href="{{ route('kasir.produk.index') }}"
+                    class="nav-item {{ request()->routeIs('kasir.produk.index') ? 'active' : '' }} flex items-center gap-3 px-4 py-3">
                     <i class="{{ request()->routeIs('kasir.produk.index') ? 'ph-fill' : 'ph-bold' }} ph-package text-xl"></i>
                     <span>Cek Stok</span>
                 </a>
@@ -99,7 +112,7 @@
 
     <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-slate-50 relative">
         <div class="p-4 md:p-8">
-            
+
             <div class="md:hidden flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
                 <div class="flex items-center gap-2">
                     <div class="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center border border-pink-200 overflow-hidden">
@@ -124,36 +137,28 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between hover:shadow-md transition">
-                    <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Transaksi Hari Ini</p>
-                        <h3 class="text-3xl font-bold text-slate-800">{{ $transaksiHariIni ?? 0 }}</h3>
-                    </div>
-                    <div class="h-12 w-12 rounded-xl bg-pink-50 flex items-center justify-center text-pink-500 text-xl border border-pink-100">
-                        <i class="ph-fill ph-receipt"></i>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+                <div class="bg-white px-5 py-4 rounded-xl border border-slate-100 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Transaksi</span>
+                    <div class="text-2xl font-bold text-slate-800 mt-1">{{ $transaksiHariIni ?? 0 }}</div>
+                </div>
+
+                <div class="bg-white px-5 py-4 rounded-xl border border-slate-100 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Omset Hari Ini</span>
+                    <div class="text-2xl font-bold text-pink-500 mt-1">
+                        Rp {{ number_format($omsetHariIni ?? 0, 0, ',', '.') }}
                     </div>
                 </div>
 
-                <div class="bg-pink-500 p-6 rounded-2xl shadow-lg shadow-pink-500/30 text-white flex items-center justify-between transform hover:-translate-y-1 transition duration-300">
+                <a href="{{ route('kasir.produk.index') }}" class="group bg-white px-5 py-4 rounded-xl border border-slate-100 shadow-sm flex items-center justify-between hover:border-pink-200 hover:bg-pink-50/30 transition-all cursor-pointer">
                     <div>
-                        <p class="text-xs font-bold text-pink-100 uppercase tracking-wider mb-1 opacity-90">Omset Hari Ini</p>
-                        <h3 class="text-2xl md:text-3xl font-bold">Rp {{ number_format($omsetHariIni ?? 0, 0, ',', '.') }}</h3>
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide group-hover:text-pink-400 transition">Shortcut</span>
+                        <div class="text-lg font-bold text-slate-700 group-hover:text-pink-600 transition mt-1">Cek Stok Barang</div>
                     </div>
-                    <div class="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center text-white text-xl backdrop-blur-sm">
-                        <i class="ph-fill ph-wallet"></i>
-                    </div>
-                </div>
-
-                <a href="{{ route('kasir.produk.index') }}" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between hover:border-pink-300 hover:shadow-md group transition cursor-pointer">
-                    <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 group-hover:text-pink-500 transition">Shortcut</p>
-                        <h3 class="text-lg font-bold text-slate-800 group-hover:text-pink-600 transition">Cek Stok Barang</h3>
-                    </div>
-                    <div class="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 text-xl group-hover:bg-pink-50 group-hover:text-pink-500 transition">
-                        <i class="ph-bold ph-magnifying-glass"></i>
-                    </div>
+                    <i class="ph-bold ph-arrow-right text-slate-300 group-hover:text-pink-500 group-hover:translate-x-1 transition-transform"></i>
                 </a>
+
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 min-h-[400px]">
@@ -226,7 +231,7 @@
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
-            
+
             if (sidebar.classList.contains('-translate-x-full')) {
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');
@@ -237,4 +242,5 @@
         }
     </script>
 </body>
+
 </html>
