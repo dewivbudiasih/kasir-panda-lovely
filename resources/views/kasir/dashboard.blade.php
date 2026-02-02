@@ -127,7 +127,7 @@
 
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-bold text-slate-800">Halo, <span class="text-pink-500">{{ Auth::user()->name ?? 'Kasir' }}</span>! 👋</h2>
+                    <h2 class="text-2xl md:text-3xl font-bold text-slate-800">Halo, <span class="text-pink-500">{{ Auth::user()->name ?? 'Kasir' }}</span> </h2>
                     <p class="text-slate-500 mt-1 text-sm md:text-base">Selamat bertugas, semoga hari ini menyenangkan.</p>
                 </div>
 
@@ -161,62 +161,57 @@
 
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 min-h-[400px]">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <i class="ph-fill ph-clock-counter-clockwise text-pink-500"></i> Riwayat Terakhir
-                    </h3>
-                    <a href="{{ route('transaksi.riwayat') }}" class="text-sm text-pink-500 font-bold hover:text-pink-700 hover:underline flex items-center gap-1 transition">
-                        Lihat Semua <i class="ph-bold ph-arrow-right"></i>
+            <div class="bg-white border border-gray-200 rounded-lg p-5">
+
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-gray-700">Riwayat Transaksi</h3>
+                    <a href="{{ route('transaksi.riwayat') }}" class="text-sm text-blue-600 hover:underline">
+                        Lihat Semua
                     </a>
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="w-full whitespace-nowrap">
-                        <thead>
-                            <tr class="text-left text-slate-500 text-xs font-bold uppercase tracking-wider border-b border-slate-100 bg-slate-50">
-                                <th class="py-3 px-4 rounded-tl-lg">ID Struk</th>
-                                <th class="py-3 px-4">Waktu</th>
-                                <th class="py-3 px-4">Kasir</th>
-                                <th class="py-3 px-4">Total</th>
-                                <th class="py-3 px-4 text-center">Status</th>
-                                <th class="py-3 px-4 text-right rounded-tr-lg">Aksi</th>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-100 text-gray-600">
+                            <tr>
+                                <th class="p-3 border-b">No. Invoice</th>
+                                <th class="p-3 border-b">Kasir</th>
+                                <th class="p-3 border-b">Total</th>
+                                <th class="p-3 border-b">Status</th>
+                                <th class="p-3 border-b text-center">Opsi</th>
                             </tr>
                         </thead>
-                        <tbody class="text-sm font-medium text-slate-600">
+                        <tbody class="text-gray-700">
                             @forelse($recentTransactions as $item)
-                            <tr class="border-b border-slate-50 last:border-0 hover:bg-slate-50 transition group">
-                                <td class="py-4 px-4 text-slate-800 font-bold font-mono">#{{ $item->invoice_code ?? $item->id }}</td>
-                                <td class="py-4 px-4">{{ $item->created_at->format('H:i') }}</td>
-                                <td class="py-4 px-4">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-6 h-6 rounded-full bg-pink-100 flex items-center justify-center text-xs text-pink-600 font-bold border border-pink-200">
-                                            {{ substr($item->user->name ?? 'K', 0, 1) }}
-                                        </div>
-                                        <span class="truncate max-w-[100px]">{{ $item->user->name ?? 'Kasir' }}</span>
-                                    </div>
+                            <tr class="border-b hover:bg-gray-50">
+
+                                <td class="p-3">
+                                    <span class="font-medium">#{{ $item->invoice_code ?? $item->id }}</span>
+                                    <div class="text-xs text-gray-400 mt-1">{{ $item->created_at->format('d/m/Y H:i') }}</div>
                                 </td>
-                                <td class="py-4 px-4 font-bold text-slate-700">
+
+                                <td class="p-3">
+                                    {{ $item->user->name ?? '-' }}
+                                </td>
+
+                                <td class="p-3 font-bold">
                                     Rp {{ number_format($item->total_price ?? 0, 0, ',', '.') }}
                                 </td>
-                                <td class="py-4 px-4 text-center">
-                                    <span class="bg-green-100 text-green-700 border border-green-200 py-1 px-3 rounded-full text-[10px] font-bold uppercase tracking-wide">LUNAS</span>
+
+                                <td class="p-3">
+                                    <span class="text-green-600 font-medium">Lunas</span>
                                 </td>
-                                <td class="py-4 px-4 text-right">
-                                    <a href="{{ route('transaksi.struk', $item->id) }}" target="_blank" class="text-slate-400 hover:text-pink-500 bg-slate-100 hover:bg-pink-50 border border-transparent hover:border-pink-200 p-2 rounded-lg transition inline-block" title="Cetak Struk">
-                                        <i class="ph-fill ph-printer text-lg"></i>
+
+                                <td class="p-3 text-center">
+                                    <a href="{{ route('transaksi.struk', $item->id) }}" target="_blank" class="inline-block bg-gray-100 text-gray-600 px-3 py-1 rounded text-xs hover:bg-gray-200 border">
+                                        Cetak
                                     </a>
                                 </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="6" class="text-center py-20">
-                                    <div class="flex flex-col items-center justify-center gap-3">
-                                        <div class="bg-slate-50 p-4 rounded-full">
-                                            <i class="ph-duotone ph-receipt text-4xl text-slate-300"></i>
-                                        </div>
-                                        <p class="text-slate-500 font-medium">Belum ada transaksi hari ini.</p>
-                                    </div>
+                                <td colspan="5" class="p-5 text-center text-gray-400">
+                                    Belum ada data transaksi.
                                 </td>
                             </tr>
                             @endforelse
