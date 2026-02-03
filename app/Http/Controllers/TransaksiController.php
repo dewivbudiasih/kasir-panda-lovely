@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
+use App\Models\Pengaturan; // <--- PASTIKAN BARIS INI ADA
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -130,8 +131,8 @@ class TransaksiController extends Controller
                 'user_id' => Auth::id(),
                 'invoice_code' => 'TRX-' . time() . rand(100, 999),
                 'total_price' => $totalPrice,
-                'bayar' => $uangBayar,      // Pastikan kolom ini ada di $fillable Model
-                'kembalian' => $kembalian,  // Pastikan kolom ini ada di $fillable Model
+                'bayar' => $uangBayar,      
+                'kembalian' => $kembalian,  
                 'created_at' => Carbon::now()
             ]);
 
@@ -168,10 +169,17 @@ class TransaksiController extends Controller
         }
     }
 
+    // --- BAGIAN INI YANG PENTING UNTUK STRUK ---
     public function struk($id)
     {
+        // 1. Ambil data transaksi
         $transaction = Transaction::with(['details.product', 'user'])->findOrFail($id);
-        return view('kasir.transaksi.struk', compact('transaction'));
+        
+        // 2. Ambil data PENGATURAN TOKO (Model Pengaturan)
+        $pengaturan = Pengaturan::first(); 
+
+        // 3. Kirim variabel $pengaturan ke view
+        return view('kasir.transaksi.struk', compact('transaction', 'pengaturan'));
     }
 
     public function riwayat()

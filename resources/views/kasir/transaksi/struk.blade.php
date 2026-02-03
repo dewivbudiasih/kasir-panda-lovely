@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Struk Pembayaran - Panda Lovely</title>
+    <title>Struk Pembayaran - {{ $pengaturan->nama_toko ?? 'Panda Lovely' }}</title>
     <style>
         @page { 
             size: 58mm auto; 
@@ -23,7 +23,6 @@
         .text-right { text-align: right; }
         .font-bold { font-weight: bold; }
 
-        /* Garis putus-putus pemisah */
         .line { 
             border-bottom: 1px dashed #000; 
             margin: 8px 0; 
@@ -40,14 +39,15 @@
             font-size: 16px; 
             margin: 0; 
             letter-spacing: 1px;
+            text-transform: uppercase; /* Agar nama toko kapital semua */
         }
 
         .address {
             font-size: 9px;
             margin-top: 2px;
+            line-height: 1.2;
         }
 
-        /* Tabel untuk kerapian layout */
         .table { 
             width: 100%; 
             border-collapse: collapse; 
@@ -58,7 +58,6 @@
             vertical-align: top; 
         }
 
-        /* Khusus bagian total agar font lebih besar sedikit */
         .total-area {
             font-size: 12px;
         }
@@ -67,13 +66,14 @@
 <body onload="window.print()">
 
     <div class="text-center section">
-        <h2 class="shop-name font-bold">PANDA LOVELY</h2>
+        <h2 class="shop-name font-bold">
+            {{ $pengaturan->nama_toko ?? 'PANDA LOVELY' }}
+        </h2>
         <div class="address">
-            Jalan Pahlawan No. 183, Kota Mojokerto <br>
-            Telp: 088-230-261-995
+            {{ $pengaturan->alamat ?? 'Alamat Toko Belum Diatur' }} <br>
+            Telp: {{ $pengaturan->no_hp ?? '-' }}
         </div>
     </div>
-
     <div class="line"></div>
 
     <table class="table">
