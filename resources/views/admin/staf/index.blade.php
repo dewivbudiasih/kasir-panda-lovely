@@ -17,14 +17,14 @@
 
 <body class="bg-gray-50">
     <div class="flex h-screen">
-        
+
         <aside class="w-64 bg-pink-100 p-6 shadow-lg flex flex-col h-full">
-            
+
             <div class="flex items-center gap-3 mb-10">
                 <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm p-0.5 border-2 border-pink-200">
                     <img src="{{ asset('img/panda.jpg') }}" alt="Logo" class="w-full h-full object-cover rounded-full">
                 </div>
-                
+
                 <div class="flex flex-col">
                     <h1 class="text-xl font-bold text-pink-600 leading-none tracking-wide">PANDA</h1>
                     <span class="text-xs font-bold text-pink-400 leading-none tracking-wide">LOVELY</span>
@@ -92,18 +92,27 @@
                                 </span>
                             </td>
                             <td class="p-4 text-gray-500">{{ $user->created_at->format('d M Y') }}</td>
-                            <td class="p-4 text-center flex justify-center gap-2">
-                                <a href="{{ route('staf.edit', $user->id) }}" class="text-yellow-500 hover:text-yellow-600 text-lg">
-                                    <i class="ph-fill ph-pencil-simple"></i>
+                            <td class="p-4 text-center">
+                                <a href="{{ route('staf.edit', $user->id) }}"
+                                    class="text-blue-600 hover:underline">
+                                    Edit
                                 </a>
-                                <form action="{{ route('staf.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus user ini?');">
+
+                                <span class="mx-1 text-gray-400">|</span>
+
+                                <form action="{{ route('staf.destroy', $user->id) }}"
+                                    method="POST"
+                                    class="inline"
+                                    onsubmit="return confirm('Yakin ingin menghapus user ini?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-500 hover:text-red-700 text-lg">
-                                        <i class="ph-fill ph-trash"></i>
+                                    <button type="submit"
+                                        class="text-red-600 hover:underline bg-transparent border-0 p-0">
+                                        Hapus
                                     </button>
                                 </form>
                             </td>
+
                         </tr>
                         @empty
                         <tr>
@@ -122,4 +131,5 @@
         </main>
     </div>
 </body>
+
 </html>

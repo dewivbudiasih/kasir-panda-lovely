@@ -80,6 +80,7 @@
             color: #6B7280;
             margin-bottom: 0.4rem;
         }
+
         #sidebar {
             transition: transform 0.3s ease-in-out;
         }
@@ -195,20 +196,30 @@
                                     <td class="py-4 px-6 font-bold text-gray-800 text-base">
                                         {{ $item->nama_kategori }}
                                     </td>
-                                    <td class="py-4 px-6 text-center">
-                                        <div class="flex justify-center gap-2">
-                                            <button onclick="toggleModal('modalEdit{{ $item->id_kategori }}')" class="w-8 h-8 flex items-center justify-center text-yellow-500 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition" title="Edit">
-                                                <i class="ph-fill ph-pencil-simple"></i>
-                                            </button>
+                                    <td class="py-4 px-6 text-center text-sm">
+                                        <span
+                                            onclick="toggleModal('modalEdit{{ $item->id_kategori }}')"
+                                            class="text-blue-600 hover:underline cursor-pointer">
+                                            Edit
+                                        </span>
 
-                                            <form action="{{ route('kategori.destroy', $item->id_kategori) }}" method="POST" onsubmit="return confirm('Yakin hapus kategori ini? Produk di dalamnya mungkin akan terpengaruh.')">
-                                                @csrf @method('DELETE')
-                                                <button type="submit" class="w-8 h-8 flex items-center justify-center text-red-500 bg-red-50 rounded-lg hover:bg-red-100 transition" title="Hapus">
-                                                    <i class="ph-fill ph-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
+                                        <span class="mx-1 text-gray-400">|</span>
+
+                                        <form
+                                            action="{{ route('kategori.destroy', $item->id_kategori) }}"
+                                            method="POST"
+                                            class="inline"
+                                            onsubmit="return confirm('Yakin hapus kategori ini? Produk di dalamnya mungkin akan terpengaruh.')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button
+                                                type="submit"
+                                                class="text-red-600 hover:underline">
+                                                Hapus
+                                            </button>
+                                        </form>
                                     </td>
+
                                 </tr>
 
                                 <div id="modalEdit{{ $item->id_kategori }}" class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center">
@@ -294,7 +305,7 @@
             const isClosed = modal.classList.contains('opacity-0');
 
             if (isClosed) {
-                modal.classList.remove('opacity-0', 'pointer-events-none'); 
+                modal.classList.remove('opacity-0', 'pointer-events-none');
                 body.classList.add('modal-active');
 
                 setTimeout(() => {
@@ -303,7 +314,7 @@
                 }, 10);
 
             } else {
-               
+
                 container.classList.remove('scale-100');
                 container.classList.add('scale-95');
 
